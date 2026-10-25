@@ -369,7 +369,7 @@ export const BookingDrawer: React.FC = () => {
                     <button
                       type="submit"
                       disabled={bookingStatus === "submitting"}
-                      className="w-full bg-brand-600 hover:bg-brand-700 text-white font-sans text-xs uppercase tracking-widest font-bold py-4 rounded-xl transition-all duration-300 shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2 mt-4 cursor-pointer"
+                      className="w-full bg-brand-600 hover:opacity-90 text-white font-sans text-xs font-bold py-4 rounded-full transition-all duration-300 shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2 mt-4 cursor-pointer"
                     >
                       {bookingStatus === "submitting" ? (
                         <>

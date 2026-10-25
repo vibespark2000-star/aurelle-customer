@@ -1,59 +1,51 @@
 "use client";
 
-import { Car } from "@phosphor-icons/react";
 import React from "react";
 
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { Navbar } from "@/components/sections/Navbar";
 import { Hero } from "@/components/sections/Hero";
-import { TamilNaduDistricts } from "@/components/sections/TamilNaduDistricts";
+import { TrustMarquee } from "@/components/sections/TrustMarquee";
 import { FleetShowcase } from "@/components/sections/FleetShowcase";
-import { OurServices } from "@/components/sections/OurServices";
 import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
 import { PopularRoutes } from "@/components/sections/PopularRoutes";
-import { BlogShowcase } from "@/components/sections/BlogShowcase";
-import { SafetyStandards } from "@/components/sections/SafetyStandards";
+import { OurServices } from "@/components/sections/OurServices";
+import { TamilNaduDistricts } from "@/components/sections/TamilNaduDistricts";
 import { BookingWorkflow } from "@/components/sections/BookingWorkflow";
-import { Testimonials } from "@/components/sections/Testimonials";
-import { TrustMarquee } from "@/components/sections/TrustMarquee";
+import { SafetyStandards } from "@/components/sections/SafetyStandards";
 import { ServiceableCities } from "@/components/sections/ServiceableCities";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { Testimonials } from "@/components/sections/Testimonials";
+import { BlogShowcase } from "@/components/sections/BlogShowcase";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { Footer } from "@/components/sections/Footer";
+import { QuickActions } from "@/components/ui/QuickActions";
 
-
+/*
+ * Section order follows the decision path: book (hero) → what you ride →
+ * why it's cheaper → where people go → extras → trust → questions.
+ */
 export default function Home() {
   return (
     <LenisProvider>
-      <div className="relative min-h-screen bg-surface text-ink">
-        {/* Persistent booking badge — bottom right. */}
-        <a
-          href="#booking-widget"
-          className="fixed bottom-6 right-6 z-40 flex h-[72px] w-[72px] flex-col items-center justify-center gap-0.5
-            rounded-full border-2 border-brand-600 bg-surface text-brand-600 shadow-lift
-            transition-transform duration-200 hover:scale-105"
-          title="Book a cab"
-        >
-          <Car size={20} weight="fill" />
-          <span className="text-[9px] font-bold uppercase leading-tight tracking-[0.06em]">Book a Cab</span>
-        </a>
-
+      <div className="relative min-h-screen bg-white text-ink">
         <Navbar />
         <Hero />
-        <TamilNaduDistricts />
+        <TrustMarquee />
         <FleetShowcase />
-        <OurServices />
         <WhyChooseUs />
         <PopularRoutes />
+        <OurServices />
+        <TamilNaduDistricts />
+        <BookingWorkflow />
+        <SafetyStandards />
         <ServiceableCities />
         <CtaBand />
-        <BlogShowcase />
-        <SafetyStandards />
-        <BookingWorkflow />
         <Testimonials />
-        <TrustMarquee />
+        <BlogShowcase />
         <FAQSection />
         <Footer />
+        <QuickActions />
       </div>
     </LenisProvider>
   );

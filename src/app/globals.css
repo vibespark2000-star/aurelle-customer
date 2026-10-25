@@ -3,49 +3,42 @@
 @tailwind utilities;
 
 /*
- * Aurelle Cabs — design tokens.
+ * Design tokens.
  *
- * One red accent on white, neutral grey text and borders. Status colours
- * (success / warning / danger) stay in their conventional hues so a booking
- * state never reads as brand decoration.
+ * White sections with cool-grey surfaces, midnight-navy dark bands, and a
+ * single solid red for every accent and action — no multi-colour gradients.
+ * Status colours keep their usual hues.
  */
 :root {
-  --background: #ffffff; /* pure white page shell */
-  /*
-   * Supporting surfaces are neutral near-whites, not pure white: an
-   * alternating band, a card and an input well all have to stay visible
-   * against the page. They are desaturated greys so the site reads as white
-   * rather than cream.
-   */
-  --surface: #fafafa; /* alternating section band */
-  --surface-card: #f7f7f8; /* card fill */
-  --surface-sunken: #f1f1f4; /* tab tracks, input wells */
-  --foreground: #1a1a1a; /* primary ink */
-  --muted: #52525b; /* body copy */
-  --subtle: #70707a; /* captions, labels */
-  --border: #e7e7ea; /* default hairline */
-  --border-strong: #d4d4d9;
+  --background: #ffffff;
+  --surface: #f7f7f8;
+  --surface-card: #f4f4f5;
+  --surface-sunken: #ededef;
+  --foreground: #141416;
+  --muted: #52525b;
+  --subtle: #71717a;
+  --border: #e7e7ea;
+  --border-strong: #d4d4d8;
 
-  --brand: #c8102e; /* crimson — text, icons, solid buttons */
-  --brand-hover: #ab0c27;
-  --brand-bright: #d32740;
-  --brand-tint: #fdf2f3;
-  --brand-tint-border: #f5c2c9;
-  --brand-rgb: 200, 16, 46;
+  --brand: #bf0123;
+  --brand-hover: #a2011e;
+  --brand-bright: #c92744;
+  --brand-tint: #fcf2f4;
+  --brand-tint-border: #f1c7cf;
+  --brand-rgb: 191, 1, 35;
 
-  --gold: #f5c518; /* secondary CTA — always dark text on it */
-  --gold-hover: #e8b30c;
+  --gold: #ffae22;
+  --gold-hover: #f59700;
+
+  --night: #141416;
+  --night-deep: #0c0c0e;
 
   --card-bg: #ffffff;
-  --radius: 0.75rem;
-  --ring: 0 0 0 3px rgba(200, 16, 46, 0.16);
-  /*
-   * Slightly deeper than on the old cream page: a white card on a white page
-   * has no fill contrast left, so the lift has to come from the shadow.
-   */
-  --shadow-sm: 0 1px 2px rgba(16, 16, 20, 0.05), 0 1px 3px rgba(16, 16, 20, 0.04);
-  --shadow-md: 0 4px 16px -4px rgba(16, 16, 20, 0.1);
-  --shadow-lg: 0 18px 40px -18px rgba(16, 16, 20, 0.18);
+  --radius: 1rem;
+  --ring: 0 0 0 4px rgba(191, 1, 35, 0.14);
+  --shadow-sm: 0 1px 2px rgba(20, 20, 22, 0.05), 0 1px 3px rgba(20, 20, 22, 0.04);
+  --shadow-md: 0 8px 24px -8px rgba(20, 20, 22, 0.14);
+  --shadow-lg: 0 24px 48px -20px rgba(20, 20, 22, 0.22);
 }
 
 * {
@@ -67,17 +60,15 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Headings stay in the sans stack, set tight — no serif display face. */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  /* Fraunces display face; Inter stays on body and UI copy. */
-  font-family: var(--font-serif, Georgia, serif);
-  letter-spacing: -0.015em;
-  font-weight: 600;
+  font-family: var(--font-display, var(--font-sans), system-ui, sans-serif);
+  letter-spacing: -0.025em;
+  font-weight: 700;
   color: var(--foreground);
 }
 
@@ -86,7 +77,6 @@ h6 {
   color: #ffffff;
 }
 
-/* Visible focus for keyboard users, suppressed for pointer clicks. */
 :focus-visible {
   outline: 2px solid var(--brand-bright);
   outline-offset: 2px;
@@ -108,7 +98,6 @@ h6 {
   background: var(--brand);
 }
 
-/* Native date/time pickers: tint the indicator to the brand. */
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
@@ -120,33 +109,69 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
 
+/* Range slider: solid red fill up to --fill (0–100%). */
+input[type="range"].range-brand {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  background:
+    linear-gradient(var(--brand), var(--brand)) 0 / var(--fill, 50%) 100% no-repeat,
+    #e7e7ea;
+  cursor: pointer;
+}
+input[type="range"].range-brand::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #fff;
+  border: 6px solid var(--brand);
+}
+input[type="range"].range-brand::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #fff;
+  border: 6px solid var(--brand);
+}
+
 @layer components {
   /* ── Buttons ──────────────────────────────────────────────────────────── */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold
-      transition-all duration-200 cursor-pointer whitespace-nowrap
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full text-sm font-semibold
+      transition-all duration-300 cursor-pointer whitespace-nowrap
       disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
-    padding: 0.75rem 1.25rem;
+    padding: 0.8rem 1.4rem;
   }
+  /* Primary: solid brand red. */
   .btn-primary {
     @apply btn text-white;
     background-color: var(--brand);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 10px 24px -12px rgba(var(--brand-rgb), 0.6);
   }
   .btn-primary:hover {
     background-color: var(--brand-hover);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
   }
-  /* Golden CTA — dark text, used for the highest-intent action in a group. */
   .btn-gold {
     @apply btn;
     background-color: var(--gold);
-    color: #1a1a1a;
-    box-shadow: var(--shadow-sm);
+    color: #141416;
+    box-shadow: 0 10px 24px -12px rgba(245, 151, 0, 0.7);
   }
   .btn-gold:hover {
     background-color: var(--gold-hover);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+  /* Solid navy — the calm, high-contrast alternative to the gradient. */
+  .btn-dark {
+    @apply btn text-white;
+    background-color: var(--night);
+  }
+  .btn-dark:hover {
+    background-color: #27272a;
+    transform: translateY(-1px);
   }
   .btn-secondary {
     @apply btn bg-white;
@@ -154,8 +179,18 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
     border: 1px solid var(--border-strong);
   }
   .btn-secondary:hover {
-    border-color: var(--brand);
-    color: var(--brand);
+    border-color: var(--foreground);
+  }
+  /* Outline for dark bands. */
+  .btn-glass {
+    @apply btn text-white;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .btn-glass:hover {
+    background: rgba(255, 255, 255, 0.16);
   }
   .btn-ghost {
     @apply btn bg-transparent;
@@ -167,82 +202,82 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   }
   .btn-sm {
     @apply text-xs;
-    padding: 0.5rem 0.875rem;
+    padding: 0.55rem 1rem;
   }
   .btn-lg {
-    @apply text-base;
-    padding: 0.9375rem 1.75rem;
+    @apply text-[15px];
+    padding: 1rem 1.9rem;
   }
 
   /* ── Surfaces ─────────────────────────────────────────────────────────── */
-  /* Blush card, as on the reference: warm fill, hairline border, soft radius. */
   .card {
-    @apply rounded-xl;
-    background-color: var(--surface-card);
+    @apply rounded-2xl bg-white;
     border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
   }
-  /* White card for forms and panels that need to read as "input surface". */
   .card-plain {
-    @apply bg-white rounded-xl;
+    @apply bg-white rounded-2xl;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
   }
   .card-hover {
     @apply card;
     transition:
-      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 0.35s ease,
-      border-color 0.35s ease;
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.45s ease,
+      border-color 0.45s ease;
   }
   .card-hover:hover {
-    border-color: var(--brand-tint-border);
+    border-color: transparent;
     box-shadow:
-      0 2px 4px rgba(10, 8, 8, 0.04),
-      0 22px 44px -22px rgba(10, 8, 8, 0.3);
-    transform: translateY(-5px);
+      0 0 0 1px rgba(20, 20, 22, 0.04),
+      0 30px 60px -28px rgba(20, 20, 22, 0.35);
+    transform: translateY(-6px);
   }
-  /* Image inside a .card-hover drifts in slightly on hover. */
   .card-hover img {
-    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .card-hover:hover img {
-    transform: scale(1.06);
+    transform: scale(1.07);
+  }
+
+  /* Card on a navy band. */
+  .card-night {
+    @apply rounded-2xl;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025));
+    border: 1px solid rgba(255, 255, 255, 0.09);
   }
 
   /* ── Forms ────────────────────────────────────────────────────────────── */
   .field-label {
-    @apply block text-xs font-semibold mb-1.5;
+    @apply block text-[11px] font-semibold uppercase mb-1.5;
+    letter-spacing: 0.08em;
     color: var(--subtle);
   }
   .field {
-    @apply w-full bg-white rounded-lg px-3.5 py-3 text-sm font-medium outline-none transition-all duration-200;
+    @apply w-full bg-white rounded-xl px-4 py-3 text-sm font-medium outline-none transition-all duration-200;
     color: var(--foreground);
     border: 1px solid var(--border-strong);
   }
   .field::placeholder {
-    color: #9ca3af;
+    color: #a1a1aa;
     font-weight: 400;
   }
   .field:hover {
-    border-color: #9ca3af;
+    border-color: #a1a1aa;
   }
   .field:focus {
     border-color: var(--brand-bright);
     box-shadow: var(--ring);
   }
 
-  /* ── Eyebrow / section heading ────────────────────────────────────────── */
-  .eyebrow {
-    @apply inline-flex items-center gap-2 text-xs font-bold uppercase;
-    letter-spacing: 0.1em;
-    color: var(--brand);
-  }
+  /* ── Section heading ──────────────────────────────────────────────────── */
   .section-title {
-    @apply text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-[1.1];
-    letter-spacing: -0.025em;
+    @apply font-display text-3xl md:text-[2.75rem] lg:text-[3.25rem] font-extrabold leading-[1.05];
+    letter-spacing: -0.035em;
   }
   .section-sub {
-    @apply text-sm md:text-base leading-relaxed;
+    @apply text-[15px] md:text-base leading-relaxed;
     color: var(--muted);
   }
 
@@ -258,7 +293,8 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
     color: var(--brand);
   }
   .badge-neutral {
-    @apply badge bg-gray-100 text-gray-700;
+    @apply badge text-ink-muted;
+    background-color: var(--surface-sunken);
     border-color: var(--border);
   }
 }
@@ -272,103 +308,83 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
     scrollbar-width: none;
   }
 
-  /* Red text gradient, used sparingly on display headings. */
-  .brand-gradient-text {
-    background: linear-gradient(135deg, #c8102e 0%, #d32740 55%, #6e0819 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+  .shell {
+    @apply max-w-7xl mx-auto px-5 sm:px-6 lg:px-8;
   }
 
-  /* Frosted panel that floats over hero imagery. */
+  /* Solid midnight band (kept as a class for the dark cards and banners). */
+  .bg-night-glow {
+    background-color: #141416;
+  }
+
+  /* Frosted panel over imagery or dark bands. */
   .glass-panel {
-    background: rgba(255, 253, 240, 0.92);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow:
-      0 2px 6px rgba(10, 8, 8, 0.06),
-      0 24px 48px -20px rgba(10, 8, 8, 0.35);
+      0 2px 6px rgba(12, 12, 14, 0.08),
+      0 40px 80px -30px rgba(12, 12, 14, 0.6);
+  }
+  .glass-dark {
+    background: rgba(20, 20, 22, 0.55);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
-  /* Crisp white copy over photography. */
   .text-cine {
     text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
   }
 
-  /* Soft brand-tinted ring for feature panels. */
   .brand-ring {
     border: 1px solid var(--brand-tint-border);
     box-shadow: 0 12px 32px -16px rgba(var(--brand-rgb), 0.22);
   }
 
-  .shell {
-    @apply max-w-7xl mx-auto px-5 sm:px-6 lg:px-8;
+  /* Faint dot grid for light bands. */
+  .dot-backdrop {
+    background-image: radial-gradient(rgba(20, 20, 22, 0.09) 1px, transparent 1px);
+    background-size: 22px 22px;
   }
-
-  /* Hairline grid used behind hero / CTA bands. */
+  /* Hairline grid for dark bands, faded toward the edges. */
+  .grid-night {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 85%);
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 85%);
+  }
   .grid-backdrop {
     background-image:
-      linear-gradient(to right, rgba(26, 26, 26, 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(26, 26, 26, 0.035) 1px, transparent 1px);
+      linear-gradient(to right, rgba(20, 20, 22, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(20, 20, 22, 0.04) 1px, transparent 1px);
     background-size: 56px 56px;
   }
 
-  /*
-   * Hero grade — three stacked passes that give the imagery filmic depth while
-   * keeping white headline copy legible over any photograph:
-   *   1. a deep shadow ramp from the left,
-   *   2. a crimson wash that carries the brand,
-   *   3. a bottom vignette the booking panel sits against.
-   */
-  /* Mirror of .hero-grade for slides whose copy sits on the right. */
-  .hero-grade-right {
-    background:
-      linear-gradient(to top, rgba(10, 8, 8, 0.72) 0%, rgba(10, 8, 8, 0.22) 24%, transparent 48%),
-      linear-gradient(
-        255deg,
-        rgba(140, 10, 32, 0.66) 0%,
-        rgba(200, 16, 46, 0.38) 34%,
-        rgba(200, 16, 46, 0.1) 54%,
-        transparent 74%
-      ),
-      linear-gradient(
-        270deg,
-        rgba(8, 6, 6, 0.86) 0%,
-        rgba(8, 6, 6, 0.66) 28%,
-        rgba(8, 6, 6, 0.36) 48%,
-        rgba(8, 6, 6, 0.12) 68%,
-        transparent 88%
-      );
+  /* Film grain, kept very low so it adds texture without looking dirty. */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  .hero-grade {
-    background:
-      linear-gradient(to top, rgba(10, 8, 8, 0.82) 0%, rgba(10, 8, 8, 0.28) 26%, transparent 52%),
-      linear-gradient(
-        105deg,
-        rgba(140, 10, 32, 0.62) 0%,
-        rgba(200, 16, 46, 0.34) 34%,
-        rgba(200, 16, 46, 0.08) 54%,
-        transparent 72%
-      ),
-      linear-gradient(
-        90deg,
-        rgba(8, 6, 6, 0.9) 0%,
-        rgba(8, 6, 6, 0.72) 28%,
-        rgba(8, 6, 6, 0.42) 48%,
-        rgba(8, 6, 6, 0.14) 68%,
-        transparent 88%
-      );
+  /* Fade the left/right edges of a horizontal marquee. */
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
   }
 
-  /* Corner vignette — subtle, keeps the eye centred. */
-  .hero-vignette {
-    background: radial-gradient(130% 95% at 50% 45%, transparent 48%, rgba(8, 6, 6, 0.42) 100%);
+  .pause-on-hover:hover {
+    animation-play-state: paused;
   }
 
-  /* Auto-advance progress bar for the active slide. */
   .slide-progress {
     animation: slide-progress-fill 7s linear forwards;
     transform-origin: left center;
@@ -381,20 +397,27 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
       transform: scaleX(1);
     }
   }
+  @keyframes gradient-pan {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .slide-progress {
       animation: none;
       transform: scaleX(1);
     }
-    /* Slides jump rather than glide for viewers who ask for less motion. */
     .hero-track {
       transition: none !important;
     }
   }
 }
 
-/* GSAP pinning helper */
 .pin-spacer {
   background-color: transparent !important;
 }
@@ -412,9 +435,8 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   }
 }
 
-/* Fixed header is ~100px tall; keep anchored sections clear of it. */
 section[id],
 div[id="booking-widget"],
 footer[id] {
-  scroll-margin-top: 7rem;
+  scroll-margin-top: 6rem;
 }

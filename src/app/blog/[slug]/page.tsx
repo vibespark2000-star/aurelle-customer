@@ -14,7 +14,7 @@ import {
 import { apiFetch } from "@/lib/apiClient";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import { SmartImage } from "@/components/ui/SmartImage";
 import Link from "next/link";
 import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
@@ -159,7 +159,7 @@ function BlogDetailContent({ slug }: { slug: string }) {
         {/* Featured Image */}
         <div className="max-w-4xl mx-auto px-6 -mt-10 relative z-20">
           <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
-            <Image src={blog.coverImage} alt={blog.title} fill priority unoptimized className="object-cover" />
+            <SmartImage src={blog.coverImage} alt={blog.title} fill priority unoptimized className="object-cover" />
           </div>
         </div>
 
@@ -220,7 +220,7 @@ function BlogDetailContent({ slug }: { slug: string }) {
                   setSelectedVehicleId("sedan-tier");
                   setBookingDrawerOpen(true);
                 }}
-                className="w-full bg-brand-600 hover:bg-brand-700 text-white py-3.5 rounded-xl font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+                className="w-full bg-brand-600 hover:opacity-90 text-white py-3.5 rounded-full font-sans text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
               >
                 <span>Book White Cab Now</span>
                 <ChevronRight size={15} />

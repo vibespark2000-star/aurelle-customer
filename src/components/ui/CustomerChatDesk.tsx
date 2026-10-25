@@ -289,7 +289,7 @@ export const CustomerChatDesk: React.FC<CustomerChatDeskProps> = ({ isOpen, onCl
                   setAuthMode("login");
                   setAuthModalOpen(true);
                 }}
-                className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md"
+                className="w-full bg-brand-600 hover:opacity-90 text-white font-bold py-3.5 rounded-full text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md"
               >
                 <Lock size={14} /> Login / Register to Chat
               </button>
@@ -319,7 +319,7 @@ export const CustomerChatDesk: React.FC<CustomerChatDeskProps> = ({ isOpen, onCl
                     setErrMsg("");
                     setSuccessMsg("");
                   }}
-                  className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider cursor-pointer transition-all shadow-md"
+                  className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:opacity-90 text-white font-bold py-2.5 rounded-full text-xs cursor-pointer transition-all shadow-md"
                 >
                   <Plus size={14} /> Raise New Support Ticket
                 </button>
@@ -475,7 +475,7 @@ export const CustomerChatDesk: React.FC<CustomerChatDeskProps> = ({ isOpen, onCl
                     <button
                       type="submit"
                       disabled={sendingReply || !replyText.trim()}
-                      className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white p-2.5 rounded-xl transition-all cursor-pointer shrink-0"
+                      className="bg-brand-600 hover:opacity-90 disabled:opacity-50 text-white p-2.5 rounded-full transition-all cursor-pointer shrink-0"
                     >
                       {sendingReply ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                     </button>
@@ -569,7 +569,7 @@ export const CustomerChatDesk: React.FC<CustomerChatDeskProps> = ({ isOpen, onCl
                 <button
                   type="submit"
                   disabled={creatingTicket}
-                  className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer transition-all shadow-md"
+                  className="w-full bg-brand-600 hover:opacity-90 disabled:opacity-60 text-white font-bold py-3.5 rounded-full text-xs flex items-center justify-center gap-2 cursor-pointer transition-all shadow-md"
                 >
                   {creatingTicket ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                   {creatingTicket ? "Raising Ticket..." : "Submit Support Ticket"}

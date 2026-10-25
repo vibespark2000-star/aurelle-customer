@@ -3,6 +3,7 @@ import { apiFetch } from "@/lib/apiClient";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { Vehicle, FLEET, POPULAR_ROUTES } from "@/data/fleet";
+import { estimateRoadKm } from "@/lib/distance";
 
 export interface TariffBreakdown {
   baseFare: number;
@@ -59,7 +60,43 @@ interface BookingContextType {
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
-const calculateDistance = (from: string, to: string) => {
+/**
+ * The fare formula, pure so the UI can preview prices without touching
+ * booking state. `oneWayKm` is the pickup-to-drop distance.
+ */
+export const estimateFare = (
+  vehicle: Vehicle,
+  oneWayKm: number,
+  tripType: "one-way" | "round-trip"
+): TariffBreakdown => {
+  const multiplier = tripType === "round-trip" ? 2 : 1;
+  const finalDistance = oneWayKm * multiplier;
+
+  const chargedDistance = Math.max(finalDistance, vehicle.minKmPerDay);
+  const baseFare = chargedDistance * vehicle.ratePerKm;
+
+  const days = Math.max(1, Math.ceil(chargedDistance / 300));
+  const driverBatta = vehicle.driverBattaPerDay * days;
+
+  const tollEstimate = tripType === "one-way" ? Math.floor(chargedDistance * 1.5) : Math.floor(chargedDistance * 1.2);
+  const permitEstimate = oneWayKm > 200 ? 400 : 0;
+
+  const subtotal = baseFare + driverBatta + tollEstimate + permitEstimate;
+  const gst = Math.round(subtotal * 0.05);
+
+  return {
+    baseFare: Math.round(baseFare),
+    driverBatta: Math.round(driverBatta),
+    tollEstimate: Math.round(tollEstimate),
+    permitEstimate: Math.round(permitEstimate),
+    gst,
+    grandTotal: Math.round(subtotal + gst),
+    ratePerKm: vehicle.ratePerKm,
+    distanceKm: finalDistance,
+  };
+};
+
+export const calculateDistance = (from: string, to: string) => {
   if (!from || !to || from === to) return 0;
 
   const route = POPULAR_ROUTES.find(
@@ -69,8 +106,8 @@ const calculateDistance = (from: string, to: string) => {
   );
   if (route) return route.distanceKm;
 
-  const charSum = (from + to).split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return 120 + (charSum % 380);
+  // Coordinate-based road estimate; 250 km only if a name isn't recognised.
+  return estimateRoadKm(from, to) ?? 250;
 };
 
 export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -129,32 +166,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const runCalculation = useCallback(() => {
     const dist = calculateDistance(pickupCity, dropCity);
-    const multiplier = tripType === "round-trip" ? 2 : 1;
-    const finalDistance = dist * multiplier;
-
-    const chargedDistance = Math.max(finalDistance, selectedVehicle.minKmPerDay);
-    const baseFare = chargedDistance * selectedVehicle.ratePerKm;
-
-    const days = Math.max(1, Math.ceil(chargedDistance / 300));
-    const driverBatta = selectedVehicle.driverBattaPerDay * days;
-
-    const tollEstimate = tripType === "one-way" ? Math.floor(chargedDistance * 1.5) : Math.floor(chargedDistance * 1.2);
-    const permitEstimate = dist > 200 ? 400 : 0;
-
-    const subtotal = baseFare + driverBatta + tollEstimate + permitEstimate;
-    const gst = Math.round(subtotal * 0.05);
-    const grandTotal = subtotal + gst;
-
-    setTariffBreakdown({
-      baseFare: Math.round(baseFare),
-      driverBatta: Math.round(driverBatta),
-      tollEstimate: Math.round(tollEstimate),
-      permitEstimate: Math.round(permitEstimate),
-      gst,
-      grandTotal: Math.round(grandTotal),
-      ratePerKm: selectedVehicle.ratePerKm,
-      distanceKm: finalDistance,
-    });
+    setTariffBreakdown(estimateFare(selectedVehicle, dist, tripType));
   }, [pickupCity, dropCity, tripType, selectedVehicle]);
 
   useEffect(() => {

@@ -1,5 +1,9 @@
 import type { Config } from "tailwindcss";
 
+/*
+ * One solid red for every accent and action, midnight navy for the dark
+ * bands. No multi-colour gradients. Amber is kept only for rating stars.
+ */
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,95 +13,130 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Crimson — the primary brand accent.
         brand: {
-          50: "#FDF2F3",
-          100: "#FBE3E6",
-          200: "#F5C2C9",
-          300: "#EC919D",
-          400: "#DE5468",
-          500: "#D32740",
-          600: "#C8102E", // solid buttons, links
-          700: "#AB0C27", // hover
-          800: "#8C0A20",
-          900: "#6E0819",
-          DEFAULT: "#C8102E",
+          // Brand crimson #BF0123 at 600; lighter/darker steps mixed toward white/black.
+          50: "#FCF2F4",
+          100: "#F9E6E9",
+          200: "#F1C7CF",
+          300: "#E599A7",
+          400: "#D55A70",
+          500: "#C92744",
+          600: "#BF0123",
+          700: "#A2011E",
+          800: "#860119",
+          900: "#690113",
+          DEFAULT: "#BF0123",
         },
-        // Golden yellow — secondary CTA (always with dark text on it).
+        // Sunset amber — secondary CTA, always with dark text on it.
         gold: {
-          50: "#FEFAE8",
-          100: "#FDF3C4",
-          200: "#FBE88C",
-          300: "#F8DA4B",
-          400: "#F5C518",
-          500: "#E8B30C",
-          600: "#C9960A",
-          DEFAULT: "#F5C518",
+          50: "#FFF8EB",
+          100: "#FFEDC7",
+          200: "#FFDA8A",
+          300: "#FFC34D",
+          400: "#FFAE22",
+          500: "#F59700",
+          600: "#D47B00",
+          DEFAULT: "#FFAE22",
+        },
+        violet: {
+          300: "#C9A2FF",
+          400: "#A970FF",
+          500: "#8B3DF7",
+          600: "#7424E0",
+          DEFAULT: "#8B3DF7",
+        },
+        // Midnight navy from the "Trip" wordmark — dark bands, hero, footer.
+        night: {
+          950: "#0C0C0E",
+          900: "#141416",
+          800: "#1C1C1F",
+          700: "#27272A",
+          600: "#3F3F46",
+          line: "rgba(255,255,255,0.09)",
+          text: "#D4D4D8",
+          dim: "#A1A1AA",
+          DEFAULT: "#141416",
         },
         ink: {
-          DEFAULT: "#1A1A1A",
+          DEFAULT: "#141416",
           muted: "#52525B",
-          subtle: "#70707A",
+          subtle: "#71717A",
         },
-        /*
-         * Deep burgundy for the dark bands — footer, CTA panels, mega-menu
-         * feature cards. Flat near-black read as a grey hole against the cream
-         * page; these carry the crimson, so dark sections stay on-brand.
-         */
+        // Kept for older references; mirrors the night scale.
         depth: {
-          DEFAULT: "#3B0F1C",
-          soft: "#4E1426", // raised cards sitting on DEFAULT
-          deep: "#280913", // gradient foot, hairlines
-          line: "#5C2434", // dividers inside a dark band
-          text: "#D9C2C8", // body copy on DEFAULT
-          dim: "#A8858F", // captions and meta on DEFAULT
+          DEFAULT: "#141416",
+          soft: "#1C1C1F",
+          deep: "#0C0C0E",
+          line: "#3F3F46",
+          text: "#D4D4D8",
+          dim: "#A1A1AA",
         },
-        /*
-         * Pure white page with neutral near-white supporting surfaces — these
-         * must stay distinguishable from the page or bands, cards and input
-         * wells all collapse into it. Mirrors the CSS vars in globals.css.
-         */
         surface: {
-          DEFAULT: "#FFFFFF", // page background
-          alt: "#FAFAFA", // alternating band
-          card: "#F7F7F8", // card fill
-          sunken: "#F1F1F4", // tab tracks, input wells
+          DEFAULT: "#FFFFFF",
+          alt: "#F7F7F8",
+          card: "#F4F4F5",
+          sunken: "#EDEDEF",
         },
         hairline: {
           DEFAULT: "#E7E7EA",
-          strong: "#D4D4D9",
+          strong: "#D4D4D8",
         },
-        accent: "var(--brand, #C8102E)",
+        accent: "var(--brand, #BF0123)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "-apple-system", "sans-serif"],
-        // Display face for headings.
-        serif: ["var(--font-serif)", "Georgia", "serif"],
+        display: ["var(--font-display)", "var(--font-sans)", "system-ui", "sans-serif"],
+        // Old name for the heading face; now the same geometric display font.
+        serif: ["var(--font-display)", "var(--font-sans)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(26, 26, 26, 0.04)",
-        lift: "0 18px 40px -18px rgba(26, 26, 26, 0.16)",
-        brand: "0 12px 32px -16px rgba(200, 16, 46, 0.3)",
+        card: "0 1px 2px rgba(20, 20, 22, 0.05)",
+        lift: "0 24px 48px -20px rgba(20, 20, 22, 0.22)",
+        brand: "0 14px 34px -14px rgba(191, 1, 35, 0.5)",
+        glow: "0 0 0 1px rgba(255,255,255,0.06), 0 30px 70px -24px rgba(12, 12, 14, 0.55)",
       },
       borderRadius: {
-        card: "0.75rem",
+        card: "1rem",
+        "4xl": "2rem",
       },
       maxWidth: {
         shell: "80rem",
       },
       keyframes: {
         "fade-up": {
-          from: { opacity: "0", transform: "translateY(12px)" },
+          from: { opacity: "0", transform: "translateY(14px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
         marquee: {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "gradient-pan": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "dash-run": {
+          to: { strokeDashoffset: "-200" },
+        },
+        "pulse-dot": {
+          "0%": { boxShadow: "0 0 0 0 rgba(52, 211, 153, 0.6)" },
+          "70%": { boxShadow: "0 0 0 10px rgba(52, 211, 153, 0)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(52, 211, 153, 0)" },
+        },
       },
       animation: {
-        "fade-up": "fade-up 0.5s ease-out both",
-        marquee: "marquee 30s linear infinite",
+        "fade-up": "fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both",
+        marquee: "marquee 40s linear infinite",
+        "marquee-slow": "marquee 70s linear infinite",
+        float: "float 6s ease-in-out infinite",
+        "float-delay": "float 7s ease-in-out 1.5s infinite",
+        "gradient-pan": "gradient-pan 8s ease infinite",
+        "dash-run": "dash-run 6s linear infinite",
+        "pulse-dot": "pulse-dot 2s infinite",
       },
     },
   },

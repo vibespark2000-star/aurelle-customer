@@ -242,7 +242,7 @@ export const CustomerAuthModal: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-sans text-xs uppercase tracking-widest font-bold py-3.5 rounded-xl transition-all shadow-md mt-2 cursor-pointer flex items-center justify-center gap-2"
+              className="w-full bg-brand-600 hover:opacity-90 text-white font-sans text-xs font-bold py-3.5 rounded-full transition-all shadow-md mt-2 cursor-pointer flex items-center justify-center gap-2"
             >
               <ShieldCheck size={16} />
               {loading ? "Creating Account..." : "Register & Continue Booking"}
@@ -285,7 +285,7 @@ export const CustomerAuthModal: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-sans text-xs uppercase tracking-widest font-bold py-3.5 rounded-xl transition-all shadow-md mt-2 cursor-pointer flex items-center justify-center gap-2"
+              className="w-full bg-brand-600 hover:opacity-90 text-white font-sans text-xs font-bold py-3.5 rounded-full transition-all shadow-md mt-2 cursor-pointer flex items-center justify-center gap-2"
             >
               <LogIn size={16} />
               {loading ? "Signing In..." : "Sign In & Continue"}

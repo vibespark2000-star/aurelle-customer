@@ -1,11 +1,17 @@
 "use client";
 
 import {
+  ArrowRight,
+  ArrowsDownUp,
+  CalendarBlank,
+  CheckCircle,
+  Envelope,
+  Lightning,
+  Phone,
+  ShieldCheck,
   WarningCircle as AlertCircle,
-  CaretLeft as ChevronLeft,
-  CaretRight as ChevronRight,
 } from "@phosphor-icons/react";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
 import { useBooking } from "@/context/BookingContext";
@@ -14,100 +20,48 @@ import { CITIES } from "@/data/fleet";
 
 interface Slide {
   image: string;
-  alt: string;
-  /** object-position, nudged so the subject stays clear of the copy. */
+  /** object-position, nudged so the subject sits in the open right half. */
   focus: string;
-  /** Which side the copy sits on; the grade mirrors to match. */
-  align: "left" | "right";
-  title: string;
-  /** Optional second line, rendered in gold. */
-  accent?: string;
-  sub: string;
-  /** Stat cards overlaid opposite the copy. */
-  cards?: { value: string; label: string }[];
+  caption: string;
 }
 
+/* Background stills, crossfaded behind the navy grade. */
 const SLIDES: Slide[] = [
-  {
-    image: "/hero/airport-pickup.jpg",
-    alt: "A uniformed chauffeur holding the door open for a traveller at airport departures",
-    focus: "72% center",
-    align: "left",
-    title: "Pay Only for One-Way,",
-    accent: "Zero Return Charges",
-    sub: "Inter-district highway travel with flat per-km pricing, automated FASTag toll estimates, and spotless air-conditioned cabs.",
-    cards: [
-      { value: "38 Districts", label: "100% Tamil Nadu coverage" },
-      { value: "Flat Per KM", label: "Starting at ₹13/km" },
-      { value: "0% Cancellation", label: "Guaranteed driver dispatch" },
-      { value: "24/7 Helpline", label: "Dedicated chauffeur desk" },
-    ],
-  },
-  {
-    image: "/hero/easy-booking.jpg",
-    alt: "Illustration of a chauffeur and traveller beside a cab, booking on a phone",
-    focus: "78% center",
-    align: "left",
-    title: "No Ride Cancellations,",
-    accent: "No Extra Charges",
-    sub: "No more last-minute cancellations or bargaining. Just a smooth ride to your destination across all 38 districts.",
-  },
-  {
-    image: "/hero/happy-kids.jpg",
-    alt: "Two children smiling out of the window of a moving cab",
-    focus: "35% center",
-    align: "right",
-    title: "Convenient Travel,",
-    accent: "Right in Your Pocket",
-    sub: "Plan, book and ride with ease — all at your convenience, with vetted chauffeurs and transparent per-km fares.",
-  },
-  {
-    image: "/hero/premium-ride.jpg",
-    alt: "A white Aurelle taxi on a city highway",
-    focus: "70% center",
-    align: "left",
-    title: "Where Every Ride",
-    accent: "Feels Premium",
-    sub: "Redefining the experience of travel across Tamil Nadu, with comfort, punctuality and convenience.",
-  },
-  {
-    image: "/hero/family-trip.jpg",
-    alt: "A family of four riding together in the back of a spacious cab",
-    focus: "30% center",
-    align: "right",
-    title: "Family Trips,",
-    accent: "Made Comfortable",
-    sub: "Spacious, sanitised vehicles with room for everyone and their luggage — priced honestly, every time.",
-  },
+  { image: "/hero/premium-ride.jpg", focus: "70% center", caption: "Premium sedans on every highway" },
+  { image: "/hero/airport-pickup.png", focus: "72% center", caption: "Chauffeur-assisted airport pickups" },
+  { image: "/hero/family-trip.jpg", focus: "30% center", caption: "Room for the whole family" },
+  { image: "/hero/happy-kids.jpg", focus: "35% center", caption: "Trips the kids remember" },
 ];
 
 const TABS = [
-  { value: "one-way", label: "Oneway Trip" },
-  { value: "outstation", label: "Outstation / Round Trip" },
+  { value: "one-way", label: "One-way drop" },
+  { value: "outstation", label: "Round trip" },
 ] as const;
 
 type TabValue = (typeof TABS)[number]["value"];
 
-const SLIDE_MS = 7000;
-const COUNT = SLIDES.length;
+const SLIDE_MS = 6500;
+
+const HIGHLIGHTS = [
+  { icon: Lightning, label: "From ₹13/km" },
+  { icon: CheckCircle, label: "Zero return charges" },
+  { icon: ShieldCheck, label: "Verified chauffeurs" },
+];
+
+const STATS = [
+  { value: "38", unit: "districts", label: "Full Tamil Nadu coverage" },
+  { value: "25K+", unit: "trips", label: "Completed journeys" },
+  { value: "4.9", unit: "★", label: "Average rider rating" },
+  { value: "24/7", unit: "", label: "Live chauffeur desk" },
+];
+
+
 
 export const Hero: React.FC = () => {
-  /**
-   * The track renders SLIDES plus a clone of the first, so `position` can run
-   * past the last index and keep gliding one way. On landing at the clone we
-   * snap back to 0 with the transition off — identical frames, so it is unseen.
-   */
-  const [position, setPosition] = useState(0);
-  const [gliding, setGliding] = useState(true);
+  const [slide, setSlide] = useState(0);
   const [tab, setTab] = useState<TabValue>("one-way");
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [calm, setCalm] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const slide = position % COUNT;
-  const active = SLIDES[slide];
-  const alignRight = active.align === "right";
 
   const {
     setTripType,
@@ -127,67 +81,13 @@ export const Hero: React.FC = () => {
 
   const { isAuthenticated, openAuthForBooking } = useCustomerAuth();
 
-  /** Held in state so toggling the OS setting mid-session takes effect. */
+  // Crossfade the background; skipped entirely for reduced-motion viewers.
   useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setCalm(query.matches);
-    sync();
-    query.addEventListener("change", sync);
-    return () => query.removeEventListener("change", sync);
+    if (query.matches) return;
+    const id = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), SLIDE_MS);
+    return () => clearInterval(id);
   }, []);
-
-  const resetTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (calm) return;
-    timerRef.current = setInterval(() => setPosition((p) => p + 1), SLIDE_MS);
-  }, [calm]);
-
-  useEffect(() => {
-    resetTimer();
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [resetTimer]);
-
-  const enableGlideNextFrame = useCallback(() => {
-    requestAnimationFrame(() => requestAnimationFrame(() => setGliding(true)));
-  }, []);
-
-  const goNext = useCallback(() => {
-    setPosition((p) => p + 1);
-    resetTimer();
-  }, [resetTimer]);
-
-  /** Going back from the first slide hops to the clone, then glides left. */
-  const goPrev = useCallback(() => {
-    resetTimer();
-    if (position % COUNT !== 0) {
-      setPosition(position - 1);
-      return;
-    }
-    setGliding(false);
-    setPosition(COUNT);
-    requestAnimationFrame(() => {
-      setPosition(COUNT - 1);
-      enableGlideNextFrame();
-    });
-  }, [position, resetTimer, enableGlideNextFrame]);
-
-  const goTo = useCallback(
-    (index: number) => {
-      setPosition(index);
-      resetTimer();
-    },
-    [resetTimer]
-  );
-
-  const handleTrackSettled = () => {
-    if (position === COUNT) {
-      setGliding(false);
-      setPosition(0);
-      enableGlideNextFrame();
-    }
-  };
 
   const handleTab = (value: TabValue) => {
     setTab(value);
@@ -204,6 +104,12 @@ export const Hero: React.FC = () => {
     const next = TABS[(current + step + TABS.length) % TABS.length];
     handleTab(next.value);
     document.getElementById(`trip-tab-${next.value}`)?.focus();
+  };
+
+  const swapCities = () => {
+    setPickupCity(dropCity);
+    setDropCity(pickupCity);
+    setError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -225,323 +131,310 @@ export const Hero: React.FC = () => {
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
 
   return (
-    <section className="relative bg-surface pt-[68px]">
-      {/* ── Stage ──────────────────────────────────────────────────────── */}
-      <div className="relative min-h-[430px] lg:min-h-[480px] overflow-hidden">
-        {/* Poster track */}
-        <div
-          className="hero-track absolute inset-0 flex will-change-transform"
-          style={{
-            transform: `translate3d(-${position * 100}%, 0, 0)`,
-            transition: gliding ? "transform 900ms cubic-bezier(0.65, 0, 0.35, 1)" : "none",
-          }}
-          onTransitionEnd={handleTrackSettled}
-        >
-          {[...SLIDES, SLIDES[0]].map((item, i) => (
-            <div key={`${item.image}-${i}`} className="relative h-full w-full shrink-0 grow-0 basis-full">
-              <Image
-                src={item.image}
-                alt={i === slide ? item.alt : ""}
-                fill
-                priority={i === 0}
-                sizes="100vw"
-                quality={85}
-                style={{ objectPosition: item.focus }}
-                className="object-cover"
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Grade — mirrors to whichever side the copy sits on. */}
-        <div
-          className={`absolute inset-0 transition-opacity duration-500 ${
-            alignRight ? "hero-grade-right" : "hero-grade"
-          }`}
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 hero-vignette pointer-events-none" aria-hidden="true" />
-
-        {/* Copy + optional stat cards */}
-        {/*
-         * Centred in the stage rather than top-anchored, so the copy never
-         * drifts into the dead band above the booking panel. The bottom pad
-         * reserves the strip the panel overlaps into.
-         */}
-        <div className="relative z-10 flex min-h-[430px] items-center lg:min-h-[480px]">
-          <div className="shell w-full pb-[124px] pt-8 lg:pb-[128px] lg:pt-10">
-            {/*
-             * Right-aligned slides reorder the columns rather than flipping
-             * `direction`: under RTL, `justify-self-end` resolves to the LEFT
-             * edge, which pinned these slides to the wrong side.
-             */}
-            <div
-              className={`grid items-center gap-8 lg:gap-12 ${
-                active.cards
-                  ? "lg:grid-cols-[minmax(0,1fr)_auto]"
-                  : "lg:grid-cols-1"
+    <section className="relative isolate overflow-hidden bg-night-950 text-white">
+      {/* ── Background stills ───────────────────────────────────────────── */}
+      <div className="absolute inset-0 -z-20" aria-hidden="true">
+        {SLIDES.map((item, i) => (
+          <div
+            key={item.image}
+            className="absolute inset-0 transition-opacity duration-[1600ms] ease-in-out"
+            style={{ opacity: i === slide ? 1 : 0 }}
+          >
+            <Image
+              src={item.image}
+              alt=""
+              fill
+              priority={i === 0}
+              sizes="100vw"
+              quality={80}
+              style={{ objectPosition: item.focus }}
+              className={`object-cover transition-transform duration-[8000ms] ease-out ${
+                i === slide ? "scale-105" : "scale-100"
               }`}
-            >
-            <div
-              className={`max-w-xl ${
-                alignRight ? "lg:order-2 lg:ml-auto lg:text-right" : "lg:order-1"
-              }`}
-            >
-              <h1
-                key={`title-${slide}`}
-                className="text-cine animate-fade-up text-[2rem] font-extrabold leading-[1.1] tracking-[-0.02em] text-white sm:text-[2.5rem] lg:text-[3rem]"
-              >
-                {active.title}
-                {active.accent && (
-                  <>
-                    <br />
-                    <span className="text-gold-400">{active.accent}</span>
-                  </>
-                )}
-              </h1>
-
-              <p
-                key={`sub-${slide}`}
-                className={`text-cine mt-4 max-w-lg animate-fade-up text-[14px] leading-relaxed text-white/85 lg:text-[15px] ${
-                  alignRight ? "lg:ml-auto" : ""
-                }`}
-              >
-                {active.sub}
-              </p>
-
-            </div>
-
-            {/* Stat cards sit opposite the copy, desktop only. */}
-            {active.cards && (
-              <div
-                key={`cards-${slide}`}
-                className={`hidden w-[420px] animate-fade-up self-center lg:grid lg:grid-cols-2 lg:gap-3.5 ${
-                  alignRight ? "lg:order-1" : "lg:order-2"
-                }`}
-              >
-                {active.cards.map((card) => (
-                  <div
-                    key={card.value}
-                    className="rounded-xl border border-white/15 bg-black/45 p-4 backdrop-blur-md"
-                  >
-                    <span className="block text-[15px] font-bold text-gold-400">{card.value}</span>
-                    <span className="mt-1 block text-[12px] leading-snug text-white/75">{card.label}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            </div>
+            />
           </div>
-        </div>
-
-        {/* Slide changes are visual only, so announce them politely. */}
-        <div className="sr-only" aria-live="polite" aria-atomic="true">
-          {`Slide ${slide + 1} of ${COUNT}: ${active.title} ${active.accent ?? ""}`.trim()}
-        </div>
-
-        {/*
-         * Controls live together in one bar on the shell's right gutter. Edge
-         * arrows used to sit over the headline on the left and the stat cards
-         * on the right; grouped here they stay clear of both.
-         */}
-        <div className="absolute inset-x-0 bottom-[100px] z-10">
-          <div className="shell flex items-center justify-end gap-3">
-            <div className="flex items-center gap-1.5 pr-1">
-              {SLIDES.map((item, i) => (
-                <button
-                  key={item.image}
-                  onClick={() => goTo(i)}
-                  aria-label={`Go to slide ${i + 1}`}
-                  aria-current={i === slide ? "true" : undefined}
-                  className={`h-[3px] cursor-pointer rounded-full transition-all duration-300 ${
-                    i === slide ? "w-8 bg-white" : "w-4 bg-white/45 hover:bg-white/70"
-                  }`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={goPrev}
-              aria-label="Previous slide"
-              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/90 backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-white"
-            >
-              <ChevronLeft size={18} weight="bold" />
-            </button>
-            <button
-              onClick={goNext}
-              aria-label="Next slide"
-              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/90 backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-white"
-            >
-              <ChevronRight size={18} weight="bold" />
-            </button>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* ── Booking panel ──────────────────────────────────────────────── */}
-      <div id="booking-widget" className="shell relative z-20 -mt-[92px] pb-12 scroll-mt-24 md:pb-14">
-        <div
-          role="tablist"
-          aria-label="Trip type"
-          className="flex items-end gap-1.5"
-          onKeyDown={handleTabKeys}
-        >
-          {TABS.map((item) => {
-            const isActive = tab === item.value;
-            return (
-              <button
-                key={item.value}
-                id={`trip-tab-${item.value}`}
-                role="tab"
-                type="button"
-                aria-selected={isActive}
-                aria-controls="trip-panel"
-                tabIndex={isActive ? 0 : -1}
-                onClick={() => handleTab(item.value)}
-                className={`cursor-pointer rounded-t-lg px-6 text-[13px] font-semibold transition-all ${
-                  isActive
-                    ? "bg-surface-card py-3.5 text-brand-600 shadow-[0_-2px_8px_rgba(10,8,8,0.08)]"
-                    : "bg-surface-card/70 py-3 text-ink-muted hover:bg-surface-card hover:text-ink"
-                }`}
+      {/*
+       * Light grade: just enough shade behind the headline on the left and
+       * the stats at the bottom; the rest of the photo stays clear.
+       */}
+      <div
+        className="absolute inset-0 -z-10"
+        aria-hidden="true"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(12,12,14,0.78) 0%, rgba(12,12,14,0.55) 35%, rgba(12,12,14,0.15) 62%, rgba(12,12,14,0) 100%), linear-gradient(0deg, rgba(12,12,14,0.85) 0%, rgba(12,12,14,0) 28%)",
+        }}
+      />
+
+      <div className="shell relative pb-8 pt-28 lg:pb-10 lg:pt-32">
+        <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-10">
+          {/* ── Copy ───────────────────────────────────────────────────── */}
+          <div className="lg:col-span-7">
+            <h1
+              className="text-cine animate-fade-up font-display text-[2.6rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-white sm:text-[3.4rem] lg:text-[4.4rem]"
+              style={{ animationDelay: "80ms" }}
+            >
+              Ride anywhere
+              <br className="hidden sm:block" /> in Tamil Nadu.
+              <br />
+              <span className="text-brand-500">Pay one way only.</span>
+            </h1>
+
+            <p
+              className="text-cine mt-6 max-w-xl animate-fade-up text-[16px] font-medium leading-relaxed text-white/90 lg:text-[17px]"
+              style={{ animationDelay: "160ms" }}
+            >
+              Premium drop taxis and outstation cabs with flat per-km pricing, FASTag tolls built in and spotless AC
+              cars — no empty-return charges, no bargaining, no last-minute cancellations.
+            </p>
+
+            <ul className="mt-7 flex animate-fade-up flex-wrap gap-2.5" style={{ animationDelay: "240ms" }}>
+              {HIGHLIGHTS.map(({ icon: Icon, label }) => (
+                <li
+                  key={label}
+                  className="flex items-center gap-2 rounded-full border border-white/15 bg-night-950/55 px-3.5 py-2 text-[13px] font-semibold text-white backdrop-blur"
+                >
+                  <Icon size={15} weight="fill" className="text-brand-500" />
+                  {label}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* ── Booking card ───────────────────────────────────────────── */}
+          <div id="booking-widget" className="relative lg:col-span-5">
+            <div className="relative animate-fade-up rounded-[1.75rem] bg-white p-5 text-ink shadow-glow sm:p-6" style={{ animationDelay: "200ms" }}>
+              <h2 className="sr-only">Book a cab</h2>
+
+              {/* Trip type — segmented control */}
+              <div
+                role="tablist"
+                aria-label="Trip type"
+                className="grid grid-cols-2 gap-1 rounded-full bg-surface-sunken p-1"
+                onKeyDown={handleTabKeys}
               >
-                {item.label}
-              </button>
-            );
-          })}
+                {TABS.map((item) => {
+                  const isActive = tab === item.value;
+                  return (
+                    <button
+                      key={item.value}
+                      id={`trip-tab-${item.value}`}
+                      role="tab"
+                      type="button"
+                      aria-selected={isActive}
+                      aria-controls="trip-panel"
+                      tabIndex={isActive ? 0 : -1}
+                      onClick={() => handleTab(item.value)}
+                      className={`cursor-pointer rounded-full py-2.5 text-[13px] font-bold transition-all duration-300 ${
+                        isActive ? "bg-night text-white shadow-md" : "text-ink-muted hover:text-ink"
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <form
+                id="trip-panel"
+                role="tabpanel"
+                aria-labelledby={`trip-tab-${tab}`}
+                onSubmit={handleSubmit}
+                className="mt-4"
+              >
+                {/* From / To with a route rail and swap button */}
+                <div className="relative rounded-2xl border border-hairline-strong bg-white">
+                  <div className="pointer-events-none absolute bottom-[30px] left-[22px] top-[30px] w-px border-l-2 border-dotted border-hairline-strong" aria-hidden="true" />
+
+                  <label htmlFor="hero-from" className="flex items-center gap-3 px-4 pb-2.5 pt-3">
+                    <span className="relative z-10 h-3 w-3 shrink-0 rounded-full border-[3px] border-ink bg-white" aria-hidden="true" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[10.5px] font-bold uppercase tracking-[0.1em] text-ink-subtle">
+                        Pickup district
+                      </span>
+                      <select
+                        id="hero-from"
+                        value={pickupCity}
+                        onChange={(e) => {
+                          setPickupCity(e.target.value);
+                          setError(null);
+                        }}
+                        className="w-full cursor-pointer appearance-none bg-transparent pr-12 text-[15px] font-semibold text-ink outline-none"
+                      >
+                        {CITIES.map((city) => (
+                          <option key={`from-${city}`} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                    </span>
+                  </label>
+
+                  <div className="ml-11 border-t border-hairline" />
+
+                  <label htmlFor="hero-to" className="flex items-center gap-3 px-4 pb-3 pt-2.5">
+                    <span className="relative z-10 h-3 w-3 shrink-0 rounded-[3px] bg-brand-600" aria-hidden="true" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[10.5px] font-bold uppercase tracking-[0.1em] text-ink-subtle">
+                        Drop district
+                      </span>
+                      <select
+                        id="hero-to"
+                        value={dropCity}
+                        onChange={(e) => {
+                          setDropCity(e.target.value);
+                          setError(null);
+                        }}
+                        className="w-full cursor-pointer appearance-none bg-transparent pr-12 text-[15px] font-semibold text-ink outline-none"
+                      >
+                        {CITIES.map((city) => (
+                          <option key={`to-${city}`} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                    </span>
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={swapCities}
+                    aria-label="Swap pickup and drop"
+                    className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-hairline-strong bg-white text-ink shadow-sm transition-all duration-300 hover:rotate-180 hover:border-ink"
+                  >
+                    <ArrowsDownUp size={16} weight="bold" />
+                  </button>
+                </div>
+
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <div className="relative">
+                    <label htmlFor="hero-date" className="sr-only">
+                      Travel date
+                    </label>
+                    <CalendarBlank size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-subtle" />
+                    <input
+                      id="hero-date"
+                      type="date"
+                      value={pickupDate}
+                      min={today}
+                      onChange={(e) => setPickupDate(e.target.value)}
+                      required
+                      className="field cursor-pointer pl-10"
+                    />
+                  </div>
+                  <div className="relative">
+                    <label htmlFor="hero-mobile" className="sr-only">
+                      Mobile number
+                    </label>
+                    <Phone size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-subtle" />
+                    <input
+                      id="hero-mobile"
+                      type="tel"
+                      inputMode="numeric"
+                      placeholder="Mobile number"
+                      value={passengerPhone}
+                      onChange={(e) => setPassengerPhone(e.target.value)}
+                      required
+                      className="field pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="relative mt-3">
+                  <label htmlFor="hero-email" className="sr-only">
+                    Email (optional)
+                  </label>
+                  <Envelope size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-subtle" />
+                  <input
+                    id="hero-email"
+                    type="email"
+                    placeholder="Email (optional)"
+                    value={passengerEmail}
+                    onChange={(e) => setPassengerEmail(e.target.value)}
+                    className="field pl-10"
+                  />
+                </div>
+
+                <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-[12px] leading-snug text-ink-muted">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(e) => {
+                      setConsent(e.target.checked);
+                      setError(null);
+                    }}
+                    className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
+                  />
+                  <span>
+                    I agree to the{" "}
+                    <a href="/privacy-policy" className="font-semibold text-ink underline decoration-brand-400 underline-offset-2">
+                      Privacy Policy
+                    </a>{" "}
+                    and{" "}
+                    <a href="/terms-and-conditions" className="font-semibold text-ink underline decoration-brand-400 underline-offset-2">
+                      Terms of Use
+                    </a>
+                    , and consent to my details being used for this booking.
+                  </span>
+                </label>
+
+                {error && (
+                  <p role="alert" className="mt-3 flex items-center gap-2 text-[13px] font-medium text-brand-600">
+                    <AlertCircle size={15} weight="fill" className="shrink-0" />
+                    {error}
+                  </p>
+                )}
+
+                <button type="submit" className="btn-primary btn-lg group mt-4 w-full">
+                  Book now
+                  <ArrowRight size={17} weight="bold" className="transition-transform group-hover:translate-x-1" />
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
 
-        <form
-          id="trip-panel"
-          role="tabpanel"
-          aria-labelledby={`trip-tab-${tab}`}
-          onSubmit={handleSubmit}
-          className="rounded-b-xl rounded-tr-xl bg-surface-card p-5 shadow-[0_18px_40px_-18px_rgba(10,8,8,0.28)] md:p-6"
-        >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            <div>
-              <label htmlFor="hero-from" className="field-label">
-                From <span className="text-brand-600">*</span>
-              </label>
-              <select
-                id="hero-from"
-                value={pickupCity}
-                onChange={(e) => {
-                  setPickupCity(e.target.value);
-                  setError(null);
-                }}
-                className="field cursor-pointer"
-              >
-                {CITIES.map((city) => (
-                  <option key={`from-${city}`} value={city}>
-                    {city}
-                  </option>
+        {/* ── Stats rail + slide dots ──────────────────────────────────── */}
+        <div className="mt-10 border-t border-white/10 pt-6 lg:mt-12">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4 lg:gap-x-14">
+              {STATS.map((stat) => (
+                <div key={stat.label}>
+                  <dt className="sr-only">{stat.label}</dt>
+                  <dd>
+                    <span className="font-display text-[30px] font-extrabold tracking-tight text-white lg:text-[34px]">
+                      {stat.value}
+                    </span>
+                    {stat.unit && <span className="ml-1 text-[14px] font-semibold text-brand-500">{stat.unit}</span>}
+                    <span className="mt-0.5 block text-[12.5px] text-night-dim">{stat.label}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            <div className="flex items-center gap-4">
+              <p className="hidden text-[12.5px] text-night-dim md:block" aria-live="polite">
+                {SLIDES[slide].caption}
+              </p>
+              <div className="flex items-center gap-1.5">
+                {SLIDES.map((item, i) => (
+                  <button
+                    key={item.image}
+                    onClick={() => setSlide(i)}
+                    aria-label={`Show background ${i + 1}`}
+                    aria-current={i === slide ? "true" : undefined}
+                    className={`h-1.5 cursor-pointer rounded-full transition-all duration-500 ${
+                      i === slide ? "w-8 bg-brand-600" : "w-1.5 bg-white/30 hover:bg-white/60"
+                    }`}
+                  />
                 ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="hero-to" className="field-label">
-                To <span className="text-brand-600">*</span>
-              </label>
-              <select
-                id="hero-to"
-                value={dropCity}
-                onChange={(e) => {
-                  setDropCity(e.target.value);
-                  setError(null);
-                }}
-                className="field cursor-pointer"
-              >
-                {CITIES.map((city) => (
-                  <option key={`to-${city}`} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="hero-date" className="field-label">
-                Date <span className="text-brand-600">*</span>
-              </label>
-              <input
-                id="hero-date"
-                type="date"
-                value={pickupDate}
-                min={today}
-                onChange={(e) => setPickupDate(e.target.value)}
-                required
-                className="field cursor-pointer"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="hero-mobile" className="field-label">
-                Mobile No <span className="text-brand-600">*</span>
-              </label>
-              <input
-                id="hero-mobile"
-                type="tel"
-                inputMode="numeric"
-                placeholder="Enter mobile number"
-                value={passengerPhone}
-                onChange={(e) => setPassengerPhone(e.target.value)}
-                required
-                className="field"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="hero-email" className="field-label">
-                Email
-              </label>
-              <input
-                id="hero-email"
-                type="email"
-                placeholder="Enter email address"
-                value={passengerEmail}
-                onChange={(e) => setPassengerEmail(e.target.value)}
-                className="field"
-              />
+              </div>
             </div>
           </div>
-
-          <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <label className="flex cursor-pointer items-start gap-2.5 text-[13px] text-ink-muted">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(e) => {
-                  setConsent(e.target.checked);
-                  setError(null);
-                }}
-                className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
-              />
-              <span>
-                I agree to the{" "}
-                <a href="/privacy-policy" className="font-semibold text-brand-600 underline">
-                  Privacy Policy
-                </a>{" "}
-                and{" "}
-                <a href="/terms-and-conditions" className="font-semibold text-brand-600 underline">
-                  Terms of Use
-                </a>{" "}
-                and consent to my details being used to process this booking.
-              </span>
-            </label>
-
-            <button type="submit" className="btn-primary shrink-0 px-10">
-              Get Fare &amp; Book
-            </button>
-          </div>
-
-          {error && (
-            <p role="alert" className="mt-3 flex items-center gap-2 text-[13px] font-medium text-brand-600">
-              <AlertCircle size={14} weight="fill" className="shrink-0" />
-              {error}
-            </p>
-          )}
-        </form>
+        </div>
       </div>
     </section>
   );

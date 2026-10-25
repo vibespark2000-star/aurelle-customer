@@ -1,6 +1,5 @@
 "use client";
 import {
-  ArrowLeft,
   Car,
   CheckCircle as CheckCircle2,
   Compass,
@@ -9,13 +8,13 @@ import {
   PhoneCall,
   ShareNetwork as Share2,
   ShieldCheck,
-  Sparkle as Sparkles,
 } from "@phosphor-icons/react";
 import { apiFetch } from "@/lib/apiClient";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { Navbar } from "@/components/sections/Navbar";
+import { Footer } from "@/components/sections/Footer";
+import { SmartImage } from "@/components/ui/SmartImage";
 import { useParams, useRouter } from "next/navigation";
 
 import { TN_DISTRICTS_DATA } from "@/data/districts";
@@ -107,35 +106,11 @@ export default function DistrictBlogPage() {
         />
       </head>
 
-      {/* Top Floating Navigation Header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-hairline px-4 md:px-8 py-3.5 shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link
-            href="/#tamil-nadu-districts"
-            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-700 hover:text-brand-600 transition-colors"
-          >
-            <ArrowLeft size={16} />
-            <span>All 38 Districts</span>
-          </Link>
-
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono uppercase bg-brand-50 text-brand-700 px-2.5 py-1 rounded-full border border-brand-600/40 font-semibold hidden sm:inline-block">
-              Official Travel Blog
-            </span>
-            <button
-              onClick={() => handleBookCab(district.name)}
-              className="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
-            >
-              <Car size={14} />
-              <span>Book Taxi to {district.name}</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero Banner Section */}
-      <section className="relative h-[480px] md:h-[560px] w-full overflow-hidden bg-slate-950">
-        <Image
+      <section className="relative h-[480px] md:h-[560px] w-full overflow-hidden bg-night-900">
+        <SmartImage
           src={district.heroImage}
           alt={district.landmarkName || district.name}
           fill
@@ -143,7 +118,7 @@ export default function DistrictBlogPage() {
           unoptimized
           className="object-cover opacity-70 scale-105 transition-transform duration-1000"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-night-950 via-night-950/60 to-night-950/20" />
 
         <div className="absolute inset-0 max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-end pb-12 z-10">
           {/* Region Tag */}
@@ -159,7 +134,7 @@ export default function DistrictBlogPage() {
 
           {/* Title & Tagline */}
           <h1 className="font-sans text-3xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight mb-3">
-            {district.name} <span className="text-brand-600 italic">District Blog</span>
+            {district.name} <span className="text-brand-500">District Guide</span>
           </h1>
 
           <p className="font-sans text-sm md:text-xl text-slate-200 max-w-3xl leading-relaxed mb-6">
@@ -188,10 +163,6 @@ export default function DistrictBlogPage() {
         <article className="lg:col-span-8 space-y-8">
           {/* Section 1: Overview & Cultural Heritage */}
           <div className="bg-white border border-hairline rounded-3xl p-6 md:p-8 shadow-sm space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 border border-brand-600/40 text-[11px] font-bold uppercase tracking-wider text-brand-700">
-              <Sparkles size={12} className="text-brand-600" />
-              <span>Heritage &amp; Travel Overview</span>
-            </div>
 
             <h2 className="font-sans text-2xl md:text-4xl font-bold text-ink">
               Exploring {district.name}: What Makes it Famous
@@ -250,7 +221,7 @@ export default function DistrictBlogPage() {
                   {/* Photo Gallery / Header Image */}
                   {hasImages ? (
                     <div className="relative h-64 md:h-80 w-full overflow-hidden bg-slate-900 group">
-                      <Image
+                      <SmartImage
                         src={p.images[activeImageIndex[index] || 0] || p.images[0]}
                         alt={p.name}
                         fill
@@ -331,9 +302,6 @@ export default function DistrictBlogPage() {
           {/* Booking Widget Card */}
           <div className="bg-white border-2 border-brand-600 rounded-3xl p-6 shadow-xl sticky top-24 space-y-5">
             <div className="text-center space-y-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-widest bg-brand-50 text-brand-700 px-3 py-1 rounded-full border border-brand-600/40 inline-block">
-                Instant Outstation Booking
-              </span>
               <h3 className="font-sans text-xl font-bold text-ink">Book Cab to {district.name}</h3>
               <p className="text-xs text-ink-subtle">Verified Pristine White Cabs &bull; Zero Return Charges</p>
             </div>
@@ -351,7 +319,7 @@ export default function DistrictBlogPage() {
             {/* Quick Action Buttons */}
             <button
               onClick={() => handleBookCab(district.name)}
-              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-sans text-xs uppercase tracking-wider font-bold py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-brand-600 hover:opacity-90 text-white font-sans text-xs font-bold py-3.5 rounded-full transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
               <Car size={16} />
               <span>Book Taxi Now</span>
@@ -407,7 +375,7 @@ export default function DistrictBlogPage() {
       </main>
 
       {/* Footer CTA Banner */}
-      <footer className="bg-surface-alt text-ink-muted py-12 border-t border-hairline">
+      <section className="bg-surface-alt text-ink-muted py-16 border-t border-hairline">
         <div className="max-w-7xl mx-auto px-6 md:px-12 text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-50 text-brand-600 border border-brand-200 text-xs font-semibold">
             <Compass size={14} />
@@ -420,13 +388,14 @@ export default function DistrictBlogPage() {
           <div className="pt-2">
             <button
               onClick={() => handleBookCab(district.name)}
-              className="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl transition-all shadow-lg cursor-pointer"
+              className="bg-brand-600 hover:opacity-90 text-white font-bold text-xs px-6 py-3.5 rounded-full transition-all shadow-lg cursor-pointer"
             >
               Book Cab to {district.name}
             </button>
           </div>
         </div>
-      </footer>
+      </section>
+      <Footer />
     </div>
   );
 }

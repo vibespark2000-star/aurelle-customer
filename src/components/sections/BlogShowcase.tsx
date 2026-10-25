@@ -1,13 +1,15 @@
 "use client";
-import { ArrowRight, Clock, Eye, Tag, User } from "@phosphor-icons/react";
+import { ArrowRight, ArrowUpRight, Clock } from "@phosphor-icons/react";
 import { apiFetch } from "@/lib/apiClient";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import { SmartImage } from "@/components/ui/SmartImage";
 import Link from "next/link";
 
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { BlogPostItem } from "@/data/blogs";
+
+const FALLBACK_COVER = "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800&auto=format&fit=crop";
 
 export const BlogShowcase: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPostItem[]>([]);
@@ -27,93 +29,109 @@ export const BlogShowcase: React.FC = () => {
 
   if (!loading && blogs.length === 0) return null;
 
+  const [featured, ...rest] = blogs;
+
   return (
-    <section id="blogs-section" className="py-12 md:py-16 bg-surface">
+    <section id="blogs-section" className="bg-white py-12 md:py-16">
       <div className="shell space-y-8">
-        {/* Header with inline CTA */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <SectionHeading
             align="left"
-            title="Travel Guides"
-            titleRest="&amp; Outstation Tips"
-            subtitle="Expert notes on cab pricing, temple pilgrimage routes, hill station drives and highway safety across Tamil Nadu."
+            title="Road-trip ideas"
+            titleRest="& insider tips."
+            subtitle="Cab pricing explained, temple circuits, hill-station drives and highway safety across Tamil Nadu."
           />
-
-          <Link href="/blog" className="btn-secondary shrink-0 group">
-            Explore all articles
-            <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
+          <Link href="/blog" className="btn-secondary group shrink-0">
+            All articles
+            <ArrowRight size={15} weight="bold" className="transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {loading
-            ? [1, 2, 3].map((i) => (
-                <div key={i} className="card p-4 space-y-4 animate-pulse" aria-hidden="true">
-                  <div className="w-full aspect-[16/10] bg-surface-sunken rounded-lg" />
-                  <div className="h-3 bg-surface-sunken rounded w-1/3" />
-                  <div className="h-5 bg-surface-sunken rounded w-3/4" />
-                  <div className="h-12 bg-surface-alt rounded w-full" />
+        {loading ? (
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2" aria-hidden="true">
+            <div className="h-[460px] animate-pulse rounded-[1.75rem] bg-surface-sunken" />
+            <div className="grid gap-5">
+              <div className="h-[220px] animate-pulse rounded-[1.75rem] bg-surface-sunken" />
+              <div className="h-[220px] animate-pulse rounded-[1.75rem] bg-surface-sunken" />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            {/* Featured */}
+            {featured && (
+              <Link
+                href={`/blog/${featured.slug}`}
+                className="group relative flex min-h-[460px] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-night-900 p-7 md:p-9"
+              >
+                <SmartImage fallbackLabel={featured.category}
+                  src={featured.coverImage || FALLBACK_COVER}
+                  alt=""
+                  fill
+                  unoptimized
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-night-950 via-night-950/50 to-transparent" />
+                <span className="absolute right-6 top-6 flex h-12 w-12 items-center justify-center rounded-full bg-white text-ink transition-all duration-500 group-hover:rotate-45 group-hover:bg-brand-600 group-hover:text-white">
+                  <ArrowUpRight size={18} weight="bold" />
+                </span>
+                <div className="relative">
+                  <span className="glass-dark inline-block rounded-full px-3 py-1 text-[11.5px] font-semibold text-white">
+                    {featured.category}
+                  </span>
+                  <h3 className="mt-4 max-w-lg font-display text-[26px] font-extrabold leading-tight tracking-tight text-white md:text-[30px]">
+                    {featured.title}
+                  </h3>
+                  <p className="mt-3 line-clamp-2 max-w-lg text-[14.5px] leading-relaxed text-night-text">{featured.excerpt}</p>
+                  <span className="mt-5 flex items-center gap-3 text-[12.5px] text-night-dim">
+                    <span>{featured.author}</span>
+                    <span className="h-1 w-1 rounded-full bg-night-dim" />
+                    <span className="flex items-center gap-1">
+                      <Clock size={12} /> {featured.readTime}
+                    </span>
+                  </span>
                 </div>
-              ))
-            : blogs.map((blog) => (
-                <article key={blog.id} className="card-hover overflow-hidden flex flex-col group">
-                  <Link
-                    href={`/blog/${blog.slug}`}
-                    className="relative block aspect-[16/10] overflow-hidden bg-surface-sunken"
-                  >
-                    <Image
-                      src={
-                        blog.coverImage ||
-                        "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800&auto=format&fit=crop"
-                      }
-                      alt={blog.title}
+              </Link>
+            )}
+
+            {/* Side list */}
+            <div className="grid gap-5">
+              {rest.map((blog) => (
+                <Link
+                  key={blog.id}
+                  href={`/blog/${blog.slug}`}
+                  className="group flex flex-col gap-5 overflow-hidden rounded-[1.75rem] border border-hairline bg-white p-2 transition-all duration-500 hover:-translate-y-1 hover:shadow-lift sm:flex-row"
+                >
+                  <div className="relative h-48 shrink-0 overflow-hidden rounded-[1.4rem] bg-surface-sunken sm:h-auto sm:w-[42%]">
+                    <SmartImage fallbackLabel={blog.category}
+                      src={blog.coverImage || FALLBACK_COVER}
+                      alt=""
                       fill
                       unoptimized
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 100vw, 25vw"
+                      className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110"
                     />
-                    <span className="absolute top-3.5 left-3.5 flex items-center gap-1 bg-white/95 backdrop-blur px-2 py-1 rounded text-[11px] font-semibold text-ink">
-                      <Tag size={10} className="text-brand-600" />
-                      {blog.category}
-                    </span>
-                  </Link>
-
-                  <div className="p-5 flex-1 flex flex-col">
-                    <div className="flex items-center gap-3 text-[12px] text-ink-subtle mb-3">
-                      <span className="flex items-center gap-1.5">
-                        <User size={12} />
-                        {blog.author.split(" ")[0]}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Clock size={12} />
-                        {blog.readTime}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Eye size={12} />
-                        {blog.views || 100}+
-                      </span>
-                    </div>
-
-                    <h3 className="text-[17px] font-bold text-ink leading-snug line-clamp-2 mb-2.5">
-                      <Link href={`/blog/${blog.slug}`} className="group-hover:text-brand-600 transition-colors">
-                        {blog.title}
-                      </Link>
-                    </h3>
-
-                    <p className="text-[13px] text-ink-muted leading-relaxed line-clamp-3">{blog.excerpt}</p>
-
-                    <Link
-                      href={`/blog/${blog.slug}`}
-                      className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-600 hover:text-brand-700 mt-5 pt-4 border-t border-hairline group/link"
-                    >
-                      Read full guide
-                      <ArrowRight size={13} className="group-hover/link:translate-x-0.5 transition-transform" />
-                    </Link>
                   </div>
-                </article>
+                  <div className="flex flex-1 flex-col px-3 pb-4 sm:py-4 sm:pr-5">
+                    <span className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-brand-600">{blog.category}</span>
+                    <h3 className="mt-2 line-clamp-2 font-display text-[18px] font-bold leading-snug tracking-tight text-ink">
+                      {blog.title}
+                    </h3>
+                    <p className="mt-2 line-clamp-2 text-[13.5px] leading-relaxed text-ink-muted">{blog.excerpt}</p>
+                    <span className="mt-auto flex items-center justify-between pt-4 text-[12.5px] text-ink-subtle">
+                      <span className="flex items-center gap-1">
+                        <Clock size={12} /> {blog.readTime}
+                      </span>
+                      <span className="flex items-center gap-1 font-semibold text-ink transition-colors group-hover:text-brand-600">
+                        Read <ArrowRight size={13} weight="bold" />
+                      </span>
+                    </span>
+                  </div>
+                </Link>
               ))}
-        </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

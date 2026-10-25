@@ -421,7 +421,7 @@ export const ServiceBookingModal: React.FC<ServiceBookingModalProps> = ({ isOpen
                     <button
                       type="button"
                       onClick={() => setCabCount(cabCount + 1)}
-                      className="w-7 h-7 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-extrabold flex items-center justify-center shadow-xs transition-all cursor-pointer"
+                      className="w-7 h-7 rounded-lg bg-brand-600 hover:opacity-90 text-white font-extrabold flex items-center justify-center shadow-xs transition-all cursor-pointer"
                       title="Increase Cabs"
                     >
                       <Plus size={14} />
@@ -534,7 +534,7 @@ export const ServiceBookingModal: React.FC<ServiceBookingModalProps> = ({ isOpen
 
               <button
                 type="submit"
-                className="w-full bg-brand-600 hover:bg-brand-700 text-white font-extrabold py-3.5 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer mt-2"
+                className="w-full bg-brand-600 hover:opacity-90 text-white font-extrabold py-3.5 rounded-full text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer mt-2"
               >
                 <span>Proceed to Security Verification</span>
                 <ArrowRight size={15} />
@@ -597,7 +597,7 @@ export const ServiceBookingModal: React.FC<ServiceBookingModalProps> = ({ isOpen
                 <button
                   onClick={handleVerifyOtpAndConfirm}
                   disabled={isSubmitting || userEnteredOtp.length !== 3}
-                  className="w-2/3 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-extrabold py-3.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  className="w-2/3 bg-brand-600 hover:opacity-90 disabled:opacity-50 text-white font-extrabold py-3.5 rounded-full text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
                   {isSubmitting ? (
                     <RefreshCw size={16} className="animate-spin" />
@@ -685,7 +685,7 @@ export const ServiceBookingModal: React.FC<ServiceBookingModalProps> = ({ isOpen
               <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                 <a
                   href="tel:+919876543210"
-                  className="w-full sm:w-1/2 bg-brand-600 hover:bg-brand-700 text-white font-extrabold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition-all"
+                  className="w-full sm:w-1/2 bg-brand-600 hover:opacity-90 text-white font-extrabold py-3 rounded-full text-xs flex items-center justify-center gap-2 shadow-md transition-all"
                 >
                   <PhoneCall size={15} />
                   <span>Call Fleet Manager</span>
