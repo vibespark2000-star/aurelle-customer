@@ -245,7 +245,7 @@ export const CustomerAccountModal: React.FC = () => {
                           setAccountModalOpen(false);
                           setBookingDrawerOpen(true);
                         }}
-                        className="bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs uppercase px-4 py-2.5 rounded-xl shadow-md transition-all cursor-pointer inline-flex items-center gap-1.5"
+                        className="bg-brand-600 hover:opacity-90 text-white font-extrabold text-[13px] px-4 py-2.5 rounded-full shadow-md transition-all cursor-pointer inline-flex items-center gap-1.5"
                       >
                         <Car size={14} /> Book A White Cab Now
                       </button>
@@ -417,7 +417,7 @@ export const CustomerAccountModal: React.FC = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-brand-600 hover:bg-brand-700 text-white font-sans text-xs uppercase tracking-widest font-bold py-3.5 rounded-xl transition-all shadow-md mt-4 cursor-pointer"
+                    className="w-full bg-brand-600 hover:opacity-90 text-white font-sans text-xs font-bold py-3.5 rounded-full transition-all shadow-md mt-4 cursor-pointer"
                   >
                     {loading ? "Saving Profile..." : "Update Profile"}
                   </button>
@@ -573,14 +573,14 @@ export const CustomerAccountModal: React.FC = () => {
               {selectedBooking.driverName && selectedBooking.driverPhone ? (
                 <a
                   href={`tel:${selectedBooking.driverPhone}`}
-                  className="bg-brand-600 hover:bg-brand-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+                  className="bg-brand-600 hover:opacity-90 text-white font-extrabold px-4 py-2.5 rounded-full text-xs flex items-center gap-1.5 shadow-md transition-all"
                 >
                   <PhoneCall size={14} /> Call Driver ({selectedBooking.driverName.split(" ")[0]})
                 </a>
               ) : (
                 <a
                   href="tel:+919876543210"
-                  className="bg-brand-600 hover:bg-brand-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+                  className="bg-brand-600 hover:opacity-90 text-white font-extrabold px-4 py-2.5 rounded-full text-xs flex items-center gap-1.5 shadow-md transition-all"
                 >
                   <PhoneCall size={14} /> Call Fleet Operations
                 </a>

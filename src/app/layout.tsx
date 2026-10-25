@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
 
@@ -11,13 +11,12 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-/** Headings and display type. */
-const fraunces = Fraunces({
+/** Headings and display type — geometric, tight, confident. */
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-serif",
+  variable: "--font-display",
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -47,7 +46,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#C8102E",
+  themeColor: "#BF0123",
   width: "device-width",
   initialScale: 1,
 };
@@ -59,7 +58,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${fraunces.variable} font-sans antialiased bg-surface text-ink`}>
+      <body className={`${inter.variable} ${jakarta.variable} font-sans antialiased bg-surface text-ink`}>
         <Providers>{children}</Providers>
       </body>
     </html>

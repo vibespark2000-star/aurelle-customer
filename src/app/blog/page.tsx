@@ -6,13 +6,12 @@ import {
   Clock,
   Compass,
   MagnifyingGlass as Search,
-  Sparkle as Sparkles,
   User,
 } from "@phosphor-icons/react";
 import { apiFetch } from "@/lib/apiClient";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import { SmartImage } from "@/components/ui/SmartImage";
 import Link from "next/link";
 import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
@@ -70,15 +69,9 @@ export default function BlogListingPage() {
           <div className="absolute top-0 right-0 w-96 h-96 bg-brand-50 rounded-full blur-3xl pointer-events-none" />
 
           <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 space-y-6 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-50 border border-brand-600/40 shadow-sm">
-              <Sparkles size={14} className="text-brand-600" />
-              <span className="text-[11px] uppercase font-bold tracking-[0.1em] text-brand-700">
-                Official Travel &amp; Highway Blog
-              </span>
-            </div>
 
             <h1 className="font-sans text-4xl md:text-6xl font-bold tracking-tight text-ink">
-              Tamil Nadu <span className="text-brand-600 italic">Travel Insights</span> &amp; Guides
+              Tamil Nadu <span className="text-brand-600">Travel Insights</span> &amp; Guides
             </h1>
 
             <p className="font-sans text-sm md:text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -99,7 +92,7 @@ export default function BlogListingPage() {
                 <Search size={18} className="absolute left-4 text-gray-400" />
                 <button
                   type="submit"
-                  className="absolute right-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md"
+                  className="absolute right-2 px-4 py-2 bg-brand-600 hover:opacity-90 text-white text-xs font-bold rounded-full transition-all cursor-pointer shadow-md"
                 >
                   Search
                 </button>
@@ -158,7 +151,7 @@ export default function BlogListingPage() {
               {featuredBlog && activeCategory === "All" && !searchQuery && (
                 <div className="bg-white rounded-3xl border-2 border-brand-600/30 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                   <div className="lg:col-span-7 relative h-72 lg:h-[450px] w-full">
-                    <Image
+                    <SmartImage
                       src={featuredBlog.coverImage}
                       alt={featuredBlog.title}
                       fill
@@ -197,7 +190,7 @@ export default function BlogListingPage() {
 
                       <Link
                         href={`/blog/${featuredBlog.slug}`}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:opacity-90 text-white text-xs font-bold rounded-full transition-all shadow-md"
                       >
                         <span>Read Article</span>
                         <ArrowRight size={14} />
@@ -221,7 +214,7 @@ export default function BlogListingPage() {
                       className="group bg-white rounded-2xl border border-hairline/60 hover:border-brand-600 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col overflow-hidden"
                     >
                       <div className="relative w-full aspect-[16/10] overflow-hidden bg-gray-100">
-                        <Image
+                        <SmartImage
                           src={blog.coverImage}
                           alt={blog.title}
                           fill

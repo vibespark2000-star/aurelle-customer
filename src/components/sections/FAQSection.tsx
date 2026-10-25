@@ -1,9 +1,9 @@
 "use client";
 import {
-  CaretDown as ChevronDown,
   Question as HelpCircle,
   ChatCircle as MessageCircle,
   Phone,
+  Plus,
   MagnifyingGlass as Search,
 } from "@phosphor-icons/react";
 import { apiFetch } from "@/lib/apiClient";
@@ -44,53 +44,77 @@ export const FAQSection: React.FC = () => {
   const categories = ["All", ...Array.from(new Set(faqs.map((f) => f.category || "General")))];
 
   const filteredFaqs = faqs.filter((faq) => {
-    const matchesSearch =
-      faq.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = faq.title.toLowerCase().includes(q) || faq.content.toLowerCase().includes(q);
     const matchesCategory = activeCategory === "All" || (faq.category || "General") === activeCategory;
     return matchesSearch && matchesCategory;
   });
 
   return (
-    <section id="faq-section" className="py-12 md:py-16 bg-surface-alt">
-      <div className="max-w-4xl mx-auto px-5 sm:px-6 space-y-7">
-        <SectionHeading
-          title="Got Questions?"
-          titleRest="We Have Answers"
-          subtitle="Everything about our cabs, toll policies, driver allowances and inter-district travel across Tamil Nadu."
-        />
+    <section id="faq-section" className="bg-surface-alt py-12 md:py-16">
+      <div className="shell grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
+        {/* ── Left: heading, search, contact ──────────────────────────── */}
+        <div className="lg:col-span-5">
+          <div className="lg:sticky lg:top-28">
+            <SectionHeading
+              align="left"
+              title="Questions?"
+              titleRest="Answered."
+              subtitle="Cabs, tolls, driver allowance and inter-district travel — everything in one place."
+            />
 
-        {/* Filters */}
-        <div className="space-y-4">
-          <div className="relative max-w-md mx-auto">
-            <label htmlFor="faq-search" className="sr-only">
-              Search questions
-            </label>
-            <Search
-              size={17}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-subtle pointer-events-none"
-            />
-            <input
-              id="faq-search"
-              type="search"
-              placeholder="Search questions — tolls, cancellation, driver…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="field pl-11"
-            />
+            <div className="relative mt-8">
+              <label htmlFor="faq-search" className="sr-only">
+                Search questions
+              </label>
+              <Search size={18} className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-ink-subtle" />
+              <input
+                id="faq-search"
+                type="search"
+                placeholder="Search tolls, cancellation, driver…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-14 w-full rounded-full border border-hairline-strong bg-white pl-12 pr-5 text-[15px] font-medium text-ink outline-none transition-all placeholder:font-normal placeholder:text-ink-subtle focus:border-brand-500 focus:shadow-[0_0_0_4px_rgba(191,1,35,0.12)]"
+              />
+            </div>
+
+            <div className="relative mt-8 overflow-hidden rounded-[1.75rem] border border-hairline border-l-4 border-l-brand-600 bg-white p-7 shadow-sm">
+              <h3 className="relative font-display text-[20px] font-bold text-ink">Still have questions?</h3>
+              <p className="relative mt-1.5 text-[14px] text-ink-muted">
+                Our support desk is online 24/7 for custom route queries.
+              </p>
+              <div className="relative mt-6 flex flex-col gap-2.5 sm:flex-row lg:flex-col xl:flex-row">
+                <a
+                  href={`${SUPPORT_WHATSAPP_URL}?text=Hi%20Aurelle%20Cabs%2C%20I%20have%20a%20question%20about%20booking`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn flex-1 bg-emerald-500 text-white hover:bg-emerald-600"
+                >
+                  <MessageCircle size={17} weight="fill" />
+                  WhatsApp us
+                </a>
+                <a href={SUPPORT_PHONE_TEL} className="btn-secondary flex-1">
+                  <Phone size={16} weight="fill" />
+                  {SUPPORT_PHONE_DISPLAY}
+                </a>
+              </div>
+            </div>
           </div>
+        </div>
 
+        {/* ── Right: categories + accordion ───────────────────────────── */}
+        <div className="lg:col-span-7">
           {categories.length > 1 && (
-            <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="no-scrollbar -mx-5 mb-6 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:flex-wrap lg:px-0">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   aria-pressed={activeCategory === cat}
-                  className={`px-3.5 py-2 rounded-lg text-[13px] font-semibold border transition-colors cursor-pointer ${
+                  className={`shrink-0 cursor-pointer rounded-full px-4 py-2 text-[13px] font-semibold transition-all duration-300 ${
                     activeCategory === cat
-                      ? "bg-brand-600 border-brand-600 text-white"
-                      : "bg-white border-hairline text-ink-muted hover:text-brand-600 hover:border-brand-200"
+                      ? "bg-brand-600 text-white shadow-md"
+                      : "border border-hairline bg-white text-ink-muted hover:border-ink hover:text-ink"
                   }`}
                 >
                   {cat}
@@ -98,86 +122,69 @@ export const FAQSection: React.FC = () => {
               ))}
             </div>
           )}
-        </div>
 
-        {/* Accordion */}
-        <div className="space-y-3">
-          {loading ? (
-            <div className="text-center py-10 text-[13px] text-ink-subtle">Loading questions…</div>
-          ) : filteredFaqs.length === 0 ? (
-            <div className="card text-center py-12 px-6">
-              <HelpCircle size={28} className="mx-auto text-ink-subtle mb-3" />
-              <p className="text-[15px] font-semibold text-ink mb-4">No questions match your search.</p>
-              <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setActiveCategory("All");
-                }}
-                className="btn-secondary btn-sm"
-              >
-                Clear search and filters
-              </button>
-            </div>
-          ) : (
-            filteredFaqs.map((faq, index) => {
-              const isOpen = openIndex === index;
-              const panelId = `faq-panel-${faq._id || index}`;
+          <div className="space-y-3">
+            {loading ? (
+              [0, 1, 2, 3].map((i) => <div key={i} className="h-[72px] animate-pulse rounded-2xl bg-surface-sunken" />)
+            ) : filteredFaqs.length === 0 ? (
+              <div className="rounded-[1.75rem] border border-hairline bg-surface-alt px-6 py-12 text-center">
+                <HelpCircle size={30} className="mx-auto mb-3 text-ink-subtle" />
+                <p className="mb-4 text-[15px] font-semibold text-ink">No questions match your search.</p>
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setActiveCategory("All");
+                  }}
+                  className="btn-secondary btn-sm"
+                >
+                  Clear search and filters
+                </button>
+              </div>
+            ) : (
+              filteredFaqs.map((faq, index) => {
+                const isOpen = openIndex === index;
+                const panelId = `faq-panel-${faq._id || index}`;
 
-              return (
-                <div key={faq._id || index} className="card overflow-hidden">
-                  <h3>
-                    <button
-                      onClick={() => setOpenIndex(isOpen ? null : index)}
-                      aria-expanded={isOpen}
-                      aria-controls={panelId}
-                      className="w-full px-5 py-4 text-left flex items-center justify-between gap-4 cursor-pointer hover:bg-surface-alt transition-colors"
-                    >
-                      <span className="flex items-center gap-3 min-w-0">
-                        <span className="badge-neutral shrink-0 hidden sm:inline-flex">
-                          {faq.category || "General"}
+                return (
+                  <div
+                    key={faq._id || index}
+                    className={`overflow-hidden rounded-2xl border transition-all duration-300 ${
+                      isOpen ? "border-transparent bg-white shadow-lift" : "border-hairline bg-white hover:border-hairline-strong"
+                    }`}
+                  >
+                    <h3>
+                      <button
+                        onClick={() => setOpenIndex(isOpen ? null : index)}
+                        aria-expanded={isOpen}
+                        aria-controls={panelId}
+                        className="flex w-full cursor-pointer items-center justify-between gap-4 px-6 py-5 text-left"
+                      >
+                        <span className="font-display text-[16px] font-semibold leading-snug text-ink">{faq.title}</span>
+                        <span
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+                            isOpen ? "rotate-45 bg-brand-600 text-white" : "bg-surface-sunken text-ink"
+                          }`}
+                        >
+                          <Plus size={15} weight="bold" />
                         </span>
-                        <span className="text-[15px] font-semibold text-ink leading-snug">{faq.title}</span>
-                      </span>
-                      <ChevronDown
-                        size={18}
-                        className={`text-ink-subtle shrink-0 transition-transform duration-200 ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                  </h3>
+                      </button>
+                    </h3>
 
-                  {isOpen && (
-                    <div id={panelId} className="px-5 pb-5 pt-4 border-t border-hairline">
-                      <p className="text-[14px] text-ink-muted leading-relaxed whitespace-pre-line">{faq.content}</p>
+                    <div
+                      id={panelId}
+                      aria-hidden={!isOpen}
+                      className={`grid transition-all duration-300 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+                    >
+                      <div className="overflow-hidden">
+                        <p className="whitespace-pre-line px-6 pb-6 text-[14.5px] leading-relaxed text-ink-muted">
+                          {faq.content}
+                        </p>
+                      </div>
                     </div>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        {/* Still stuck? */}
-        <div className="card p-6 text-center">
-          <h3 className="text-[17px] font-bold text-ink mb-1.5">Still have questions?</h3>
-          <p className="text-[14px] text-ink-muted mb-5">
-            Our support desk is online 24/7 to answer custom route queries.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a
-              href={`${SUPPORT_WHATSAPP_URL}?text=Hi%20Aurelle%20Cabs%2C%20I%20have%20a%20question%20about%20booking`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              <MessageCircle size={16} />
-              Chat on WhatsApp
-            </a>
-            <a href={SUPPORT_PHONE_TEL} className="btn-secondary w-full sm:w-auto">
-              <Phone size={15} />
-              {SUPPORT_PHONE_DISPLAY}
-            </a>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </div>
